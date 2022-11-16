@@ -1,4 +1,4 @@
-package com.rcudev.player_service.notification
+package com.rcudev.player_service.presentation
 
 import android.app.PendingIntent
 import android.content.Context

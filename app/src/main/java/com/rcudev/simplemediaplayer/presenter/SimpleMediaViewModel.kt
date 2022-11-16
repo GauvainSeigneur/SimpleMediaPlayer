@@ -1,18 +1,19 @@
 package com.rcudev.simplemediaplayer.presenter
 
-import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
-import com.rcudev.player_service.domain.RfMedia
-import com.rcudev.player_service.models.MediaState
-import com.rcudev.player_service.models.PlayerControlEvent
-import com.rcudev.player_service.handler.PlayerControlEventHandler
-import com.rcudev.player_service.service.PlayerPreparator
-import com.rcudev.player_service.handler.PlayerStateHandler
+import com.rcudev.player_service.domain.usecase.GetMediaStateUseCase
+import com.rcudev.player_service.domain.models.RfMedia
+import com.rcudev.player_service.domain.models.RfMediaState
+import com.rcudev.player_service.domain.models.RfPlayerControlEvent
+import com.rcudev.player_service.domain.usecase.AddItemInPlayerUseCase
+import com.rcudev.player_service.domain.usecase.SetControlPlayerEventUseCase
+import com.rcudev.player_service.domain.usecase.StartPlayerServiceUseCase
+import com.rcudev.player_service.domain.usecase.StopPlayerServiceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,9 +24,11 @@ import javax.inject.Inject
 @OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
 class SimpleMediaViewModel @Inject constructor(
-    private val playerPreparator: PlayerPreparator,
-    private val playerStateHandler: PlayerStateHandler,
-    private val playerControlEventHandler: PlayerControlEventHandler,
+    private val startPlayerServiceUseCase: StartPlayerServiceUseCase,
+    private val stopPlayerServiceUseCase: StopPlayerServiceUseCase,
+    private val addItemInPlayerUseCase: AddItemInPlayerUseCase,
+    private val getMediaStateUseCase: GetMediaStateUseCase,
+    private val setControlPlayerEventUseCase: SetControlPlayerEventUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -40,14 +43,13 @@ class SimpleMediaViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             loadData()
-
-            playerStateHandler.simpleMediaState.collect { mediaState ->
+            getMediaStateUseCase().collect { mediaState ->
                 when (mediaState) {
-                    is MediaState.Buffering -> calculateProgressValues(mediaState.progress)
-                    is MediaState.Initial -> _uiState.value = UIState.Initial
-                    is MediaState.Playing -> isPlaying = mediaState.isPlaying
-                    is MediaState.Progress -> calculateProgressValues(mediaState.progress)
-                    is MediaState.Ready -> {
+                    is RfMediaState.Buffering -> calculateProgressValues(mediaState.progress)
+                    is RfMediaState.Initial -> _uiState.value = UIState.Initial
+                    is RfMediaState.Playing -> isPlaying = mediaState.isPlaying
+                    is RfMediaState.Progress -> calculateProgressValues(mediaState.progress)
+                    is RfMediaState.Ready -> {
                         duration = mediaState.duration
                         _uiState.value = UIState.Ready
                     }
@@ -58,27 +60,24 @@ class SimpleMediaViewModel @Inject constructor(
 
     override fun onCleared() {
         viewModelScope.launch {
-            playerControlEventHandler.onPlayerEvent(PlayerControlEvent.Stop)
+            setControlPlayerEventUseCase(RfPlayerControlEvent.Stop)
         }
+        stopPlayerServiceUseCase()
     }
 
-    fun startService(context: Context) {
-        playerPreparator.startPlayerService(context)
-    }
-
-    fun stopService(context: Context) {
-        playerPreparator.stopPlayerService(context)
+    fun startService() {
+        startPlayerServiceUseCase()
     }
 
     fun onUIEvent(uiEvent: UIEvent) = viewModelScope.launch {
         when (uiEvent) {
-            UIEvent.Backward -> playerControlEventHandler.onPlayerEvent(PlayerControlEvent.Backward)
-            UIEvent.Forward -> playerControlEventHandler.onPlayerEvent(PlayerControlEvent.Forward)
-            UIEvent.PlayPause -> playerControlEventHandler.onPlayerEvent(PlayerControlEvent.PlayPause)
+            UIEvent.Backward -> setControlPlayerEventUseCase(RfPlayerControlEvent.Backward)
+            UIEvent.Forward -> setControlPlayerEventUseCase(RfPlayerControlEvent.Forward)
+            UIEvent.PlayPause -> setControlPlayerEventUseCase(RfPlayerControlEvent.PlayPause)
             is UIEvent.UpdateProgress -> {
                 progress = uiEvent.newProgress
-                playerControlEventHandler.onPlayerEvent(
-                    PlayerControlEvent.UpdateProgress(
+                setControlPlayerEventUseCase(
+                    RfPlayerControlEvent.UpdateProgress(
                         uiEvent.newProgress
                     )
                 )
@@ -99,7 +98,7 @@ class SimpleMediaViewModel @Inject constructor(
     }
 
     private fun loadData() {
-        playerPreparator.addMediaItem(RfMedia(
+        addItemInPlayerUseCase(RfMedia(
             id = "id",
             albumTitle = "SoundHelix"
         ))

@@ -6,8 +6,18 @@ import androidx.media3.common.C
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
-import com.rcudev.player_service.handler.PlayerStateHandler
-import com.rcudev.player_service.notification.PlayerNotificationBuilder
+import com.rcudev.player_service.data.controller.MediaStateController
+import com.rcudev.player_service.data.controller.PlayerControlEventController
+import com.rcudev.player_service.data.controller.PlayerMediaController
+import com.rcudev.player_service.data.controller.PlayerServiceController
+import com.rcudev.player_service.data.handler.PlayerStateHandler
+import com.rcudev.player_service.domain.repository.MediaStateRepository
+import com.rcudev.player_service.domain.repository.PlayerControlEventRepository
+import com.rcudev.player_service.domain.repository.PlayerMediaRepository
+import com.rcudev.player_service.domain.repository.PlayerServiceRepository
+import com.rcudev.player_service.domain.repository.PlayerStateRepository
+import com.rcudev.player_service.presentation.PlayerNotificationBuilder
+import com.rcudev.player_service.data.mapper.MediaItemMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -59,11 +69,33 @@ class SimpleMediaModule {
         MediaSession.Builder(context, player).build()
 
     @Provides
-    @Singleton
-    fun provideServiceHandler(
+    fun provideMediaStateRepository(
         player: ExoPlayer
-    ): PlayerStateHandler =
-        PlayerStateHandler(
-            player = player
-        )
+    ): MediaStateRepository = MediaStateController(player)
+
+    @Provides
+    fun provideControlEventRepository(
+        player: ExoPlayer
+    ): PlayerControlEventRepository = PlayerControlEventController(player)
+
+
+    @Provides
+    fun providePlayerMediaRepository(
+        player: ExoPlayer,
+        mediaItemMapper: MediaItemMapper
+    ): PlayerMediaRepository = PlayerMediaController(player, mediaItemMapper)
+
+
+    @Provides
+    fun providePlayerServiceRepository(
+        @ApplicationContext context: Context,
+    ): PlayerServiceRepository = PlayerServiceController(context)
+
+
+    @Provides
+    fun providePlayerStateRepository(
+        player: ExoPlayer,
+        mediaStateRepository: MediaStateRepository,
+    ): PlayerStateRepository = PlayerStateHandler(player, mediaStateRepository)
+
 }

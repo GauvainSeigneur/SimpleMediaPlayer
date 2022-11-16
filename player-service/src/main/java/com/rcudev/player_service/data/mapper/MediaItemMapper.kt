@@ -1,15 +1,16 @@
-package com.rcudev.player_service.service.mapper
+package com.rcudev.player_service.data.mapper
 
 import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import com.rcudev.player_service.domain.RfMedia
+import com.rcudev.player_service.domain.models.RfMedia
 import javax.inject.Inject
 
 class MediaItemMapper @Inject constructor() {
 
     fun mapToMediaItem(rfMedia: RfMedia): MediaItem {
         return MediaItem.Builder()
+            .setMediaId(rfMedia.id)
             .setUri("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
             .setMediaMetadata(
                 MediaMetadata.Builder()
