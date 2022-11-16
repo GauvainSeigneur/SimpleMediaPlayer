@@ -1,4 +1,4 @@
-package com.rcudev.player_service.service.notification
+package com.rcudev.player_service.notification
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -17,14 +17,16 @@ import com.rcudev.player_service.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-private const val NOTIFICATION_ID = 200
-private const val NOTIFICATION_CHANNEL_NAME = "notification channel 1"
-private const val NOTIFICATION_CHANNEL_ID = "notification channel id 1"
-
-class SimpleMediaNotificationManager @Inject constructor(
+class PlayerNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
     private val player: ExoPlayer
 ) {
+
+    companion object {
+        private const val NOTIFICATION_ID = 200
+        private const val NOTIFICATION_CHANNEL_NAME = "notification channel 1"
+        private const val NOTIFICATION_CHANNEL_ID = "notification channel id 1"
+    }
 
     private var notificationManager: NotificationManagerCompat =
         NotificationManagerCompat.from(context)
@@ -37,14 +39,14 @@ class SimpleMediaNotificationManager @Inject constructor(
         mediaSessionService: MediaSessionService,
         mediaSession: MediaSession
     ) {
-        buildNotification(mediaSession)
+        bindNotificationToPlayer(mediaSession)
         startForegroundNotification(mediaSessionService)
     }
 
-    private fun buildNotification(mediaSession: MediaSession) {
+    private fun bindNotificationToPlayer(mediaSession: MediaSession) {
         PlayerNotificationManager.Builder(context, NOTIFICATION_ID, NOTIFICATION_CHANNEL_ID)
             .setMediaDescriptionAdapter(
-                SimpleMediaNotificationAdapter(
+                PlayerMediaNotificationAdapter(
                     context = context,
                     pendingIntent = mediaSession.sessionActivity
                 )
@@ -64,6 +66,7 @@ class SimpleMediaNotificationManager @Inject constructor(
     private fun startForegroundNotification(mediaSessionService: MediaSessionService) {
         val notification = Notification.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setCategory(Notification.CATEGORY_SERVICE)
+            .setSmallIcon(R.drawable.ic_microphone)
             .build()
         mediaSessionService.startForeground(NOTIFICATION_ID, notification)
     }

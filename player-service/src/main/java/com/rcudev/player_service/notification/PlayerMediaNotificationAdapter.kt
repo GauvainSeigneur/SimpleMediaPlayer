@@ -1,4 +1,4 @@
-package com.rcudev.player_service.service.notification
+package com.rcudev.player_service.notification
 
 import android.app.PendingIntent
 import android.content.Context
@@ -11,7 +11,11 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 
-class SimpleMediaNotificationAdapter(
+/**
+ * adapter to handle media data info in notification.
+ * Could be very useful for the next phases
+ */
+class PlayerMediaNotificationAdapter(
     private val context: Context,
     private val pendingIntent: PendingIntent?
 ) : PlayerNotificationManager.MediaDescriptionAdapter {

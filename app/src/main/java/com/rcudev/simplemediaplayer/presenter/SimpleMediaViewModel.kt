@@ -1,17 +1,18 @@
 package com.rcudev.simplemediaplayer.presenter
 
-import android.net.Uri
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
-import com.rcudev.player_service.service.PlayerEvent
-import com.rcudev.player_service.service.SimpleMediaServiceHandler
-import com.rcudev.player_service.service.SimpleMediaState
+import com.rcudev.player_service.domain.RfMedia
+import com.rcudev.player_service.models.MediaState
+import com.rcudev.player_service.models.PlayerControlEvent
+import com.rcudev.player_service.handler.PlayerControlEventHandler
+import com.rcudev.player_service.service.PlayerPreparator
+import com.rcudev.player_service.handler.PlayerStateHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +23,9 @@ import javax.inject.Inject
 @OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
 class SimpleMediaViewModel @Inject constructor(
-    private val simpleMediaServiceHandler: SimpleMediaServiceHandler,
+    private val playerPreparator: PlayerPreparator,
+    private val playerStateHandler: PlayerStateHandler,
+    private val playerControlEventHandler: PlayerControlEventHandler,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -38,13 +41,13 @@ class SimpleMediaViewModel @Inject constructor(
         viewModelScope.launch {
             loadData()
 
-            simpleMediaServiceHandler.simpleMediaState.collect { mediaState ->
+            playerStateHandler.simpleMediaState.collect { mediaState ->
                 when (mediaState) {
-                    is SimpleMediaState.Buffering -> calculateProgressValues(mediaState.progress)
-                    SimpleMediaState.Initial -> _uiState.value = UIState.Initial
-                    is SimpleMediaState.Playing -> isPlaying = mediaState.isPlaying
-                    is SimpleMediaState.Progress -> calculateProgressValues(mediaState.progress)
-                    is SimpleMediaState.Ready -> {
+                    is MediaState.Buffering -> calculateProgressValues(mediaState.progress)
+                    is MediaState.Initial -> _uiState.value = UIState.Initial
+                    is MediaState.Playing -> isPlaying = mediaState.isPlaying
+                    is MediaState.Progress -> calculateProgressValues(mediaState.progress)
+                    is MediaState.Ready -> {
                         duration = mediaState.duration
                         _uiState.value = UIState.Ready
                     }
@@ -55,19 +58,27 @@ class SimpleMediaViewModel @Inject constructor(
 
     override fun onCleared() {
         viewModelScope.launch {
-            simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Stop)
+            playerControlEventHandler.onPlayerEvent(PlayerControlEvent.Stop)
         }
+    }
+
+    fun startService(context: Context) {
+        playerPreparator.startPlayerService(context)
+    }
+
+    fun stopService(context: Context) {
+        playerPreparator.stopPlayerService(context)
     }
 
     fun onUIEvent(uiEvent: UIEvent) = viewModelScope.launch {
         when (uiEvent) {
-            UIEvent.Backward -> simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Backward)
-            UIEvent.Forward -> simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.Forward)
-            UIEvent.PlayPause -> simpleMediaServiceHandler.onPlayerEvent(PlayerEvent.PlayPause)
+            UIEvent.Backward -> playerControlEventHandler.onPlayerEvent(PlayerControlEvent.Backward)
+            UIEvent.Forward -> playerControlEventHandler.onPlayerEvent(PlayerControlEvent.Forward)
+            UIEvent.PlayPause -> playerControlEventHandler.onPlayerEvent(PlayerControlEvent.PlayPause)
             is UIEvent.UpdateProgress -> {
                 progress = uiEvent.newProgress
-                simpleMediaServiceHandler.onPlayerEvent(
-                    PlayerEvent.UpdateProgress(
+                playerControlEventHandler.onPlayerEvent(
+                    PlayerControlEvent.UpdateProgress(
                         uiEvent.newProgress
                     )
                 )
@@ -88,34 +99,10 @@ class SimpleMediaViewModel @Inject constructor(
     }
 
     private fun loadData() {
-        val mediaItem = MediaItem.Builder()
-            .setUri("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
-            .setMediaMetadata(
-                MediaMetadata.Builder()
-                    .setFolderType(MediaMetadata.FOLDER_TYPE_ALBUMS)
-                    .setArtworkUri(Uri.parse("https://i.pinimg.com/736x/4b/02/1f/4b021f002b90ab163ef41aaaaa17c7a4.jpg"))
-                    .setAlbumTitle("SoundHelix")
-                    .setDisplayTitle("Song 1")
-                    .build()
-            ).build()
-
-        //val mediaItemList = mutableListOf<MediaItem>()
-        //(1..17).forEach {
-        //    mediaItemList.add(
-        //        MediaItem.Builder()
-        //            .setUri("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-$it.mp3")
-        //            .setMediaMetadata(MediaMetadata.Builder()
-        //                .setFolderType(MediaMetadata.FOLDER_TYPE_ALBUMS)
-        //                .setArtworkUri(Uri.parse("https://cdns-images.dzcdn.net/images/cover/1fddc1ab0535ee34189dc4c9f5f87bf9/264x264.jpg"))
-        //                .setAlbumTitle("SoundHelix")
-        //                .setDisplayTitle("Song $it")
-        //                .build()
-        //            ).build()
-        //    )
-        //}
-
-        simpleMediaServiceHandler.addMediaItem(mediaItem)
-        //simpleMediaServiceHandler.addMediaItemList(mediaItemList)
+        playerPreparator.addMediaItem(RfMedia(
+            id = "id",
+            albumTitle = "SoundHelix"
+        ))
     }
 
 }

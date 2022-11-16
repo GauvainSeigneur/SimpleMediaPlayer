@@ -5,7 +5,7 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
-import com.rcudev.player_service.service.notification.SimpleMediaNotificationManager
+import com.rcudev.player_service.notification.PlayerNotificationBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -17,14 +17,13 @@ class SimpleMediaService : MediaSessionService() {
     @Inject
     lateinit var mediaSession: MediaSession
     @Inject
-    lateinit var notificationManager: SimpleMediaNotificationManager
+    lateinit var notificationManager: PlayerNotificationBuilder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         notificationManager.startNotificationService(
             mediaSessionService = this,
             mediaSession = mediaSession
         )
-
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -32,6 +31,7 @@ class SimpleMediaService : MediaSessionService() {
         super.onDestroy()
         mediaSession.run {
             release()
+            // todo : why ?
             if (player.playbackState != Player.STATE_IDLE) {
                 player.release()
             }

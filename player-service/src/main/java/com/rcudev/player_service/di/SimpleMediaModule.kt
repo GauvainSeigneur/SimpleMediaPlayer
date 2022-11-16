@@ -6,8 +6,8 @@ import androidx.media3.common.C
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
-import com.rcudev.player_service.service.SimpleMediaServiceHandler
-import com.rcudev.player_service.service.notification.SimpleMediaNotificationManager
+import com.rcudev.player_service.handler.PlayerStateHandler
+import com.rcudev.player_service.notification.PlayerNotificationBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,8 +44,8 @@ class SimpleMediaModule {
     fun provideNotificationManager(
         @ApplicationContext context: Context,
         player: ExoPlayer
-    ): SimpleMediaNotificationManager =
-        SimpleMediaNotificationManager(
+    ): PlayerNotificationBuilder =
+        PlayerNotificationBuilder(
             context = context,
             player = player
         )
@@ -62,8 +62,8 @@ class SimpleMediaModule {
     @Singleton
     fun provideServiceHandler(
         player: ExoPlayer
-    ): SimpleMediaServiceHandler =
-        SimpleMediaServiceHandler(
+    ): PlayerStateHandler =
+        PlayerStateHandler(
             player = player
         )
 }
