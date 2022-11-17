@@ -1,7 +1,7 @@
 package com.rcudev.player_service.data.controller
 
 import androidx.media3.exoplayer.ExoPlayer
-import com.rcudev.player_service.domain.models.RfPlayerControlEvent
+import com.rcudev.player_service.domain.models.PlayerControlEvent
 import com.rcudev.player_service.domain.repository.PlayerControlEventRepository
 import kotlinx.coroutines.*
 
@@ -18,21 +18,21 @@ class PlayerControlEventController constructor(
         job = Job()
     }
 
-    override suspend fun onControlEvent(event: RfPlayerControlEvent) {
+    override suspend fun onControlEvent(event: PlayerControlEvent) {
         when (event) {
-            RfPlayerControlEvent.Backward -> player.seekBack()
-            RfPlayerControlEvent.Forward -> player.seekForward()
-            RfPlayerControlEvent.PlayPause -> {
+            PlayerControlEvent.Backward -> player.seekBack()
+            PlayerControlEvent.Forward -> player.seekForward()
+            PlayerControlEvent.PlayPause -> {
                 if (player.isPlaying) {
                     player.pause()
                 } else {
                     player.play()
                 }
             }
-            RfPlayerControlEvent.Stop -> {
+            PlayerControlEvent.Stop -> {
                 // do nothing
             }
-            is RfPlayerControlEvent.UpdateProgress -> player.seekTo((player.duration * event.newProgress).toLong())
+            is PlayerControlEvent.UpdateProgress -> player.seekTo((player.duration * event.newProgress).toLong())
         }
     }
 

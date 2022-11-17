@@ -1,9 +1,9 @@
 package com.rcudev.player_service.domain.repository
 
-import com.rcudev.player_service.domain.models.RfMedia
+import androidx.media3.common.MediaItem
 
 interface PlayerMediaRepository {
 
-    fun addItem(rfMedia: RfMedia)
+    fun addItem(mediaItem: MediaItem)
 
 }

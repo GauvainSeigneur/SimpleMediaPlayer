@@ -12,10 +12,10 @@ object DomainModule {
 
     fun getStopPlayerServiceUseCase(): StopPlayerServiceUseCase = StopPlayerServiceUseCase(DataModule.getPlayerServiceRepository())
 
-    fun getAddItemInPlayerUseCase(): AddItemInPlayerUseCase = AddItemInPlayerUseCase(DataModule.getPlayerMediaRepository())
+    fun <T>getAddItemInPlayerUseCase(): AddItemInPlayerUseCase<T> = AddItemInPlayerUseCase(DataModule.getPlayerMediaRepository())
 
     fun getGetMediaStateUseCase(): GetMediaStateUseCase = GetMediaStateUseCase(DataModule.getMediaStateRepository())
-    
+
     fun getSetControlPlayerEventUseCase(): SetControlPlayerEventUseCase = SetControlPlayerEventUseCase(
         DataModule.getPlayerControlEventRepository(),
         DataModule.getMediaStateRepository(),

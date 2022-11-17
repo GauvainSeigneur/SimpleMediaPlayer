@@ -6,7 +6,6 @@ import com.rcudev.player_service.data.controller.PlayerControlEventController
 import com.rcudev.player_service.data.controller.PlayerMediaController
 import com.rcudev.player_service.data.controller.PlayerServiceController
 import com.rcudev.player_service.data.handler.PlayerStateHandler
-import com.rcudev.player_service.data.mapper.MediaItemMapper
 import com.rcudev.player_service.domain.repository.MediaStateRepository
 import com.rcudev.player_service.domain.repository.PlayerControlEventRepository
 import com.rcudev.player_service.domain.repository.PlayerMediaRepository
@@ -14,8 +13,6 @@ import com.rcudev.player_service.domain.repository.PlayerServiceRepository
 import com.rcudev.player_service.domain.repository.PlayerStateRepository
 
 object DataModule {
-
-    private fun getMediaItemMapper(): MediaItemMapper = MediaItemMapper()
 
     // singleton
     private val playerServiceRepo: PlayerServiceRepository by lazy {
@@ -26,7 +23,7 @@ object DataModule {
 
     fun getPlayerControlEventRepository(): PlayerControlEventRepository = PlayerControlEventController(LibraryModule.player)
 
-    fun getPlayerMediaRepository(): PlayerMediaRepository = PlayerMediaController(LibraryModule.player, getMediaItemMapper())
+    fun getPlayerMediaRepository(): PlayerMediaRepository = PlayerMediaController(LibraryModule.player)
 
     fun getPlayerServiceRepository(): PlayerServiceRepository = playerServiceRepo
 

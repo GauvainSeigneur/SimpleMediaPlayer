@@ -1,17 +1,16 @@
 package com.rcudev.player_service.data.controller
 
+import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
-import com.rcudev.player_service.domain.models.RfMedia
 import com.rcudev.player_service.domain.repository.PlayerMediaRepository
-import com.rcudev.player_service.data.mapper.MediaItemMapper
 
 class PlayerMediaController constructor(
     private val exoPlayer: ExoPlayer,
-    private val mediaItemMapper: MediaItemMapper
 ) : PlayerMediaRepository {
 
-    override fun addItem(rfMedia: RfMedia) {
-        exoPlayer.setMediaItem(mediaItemMapper.mapToMediaItem(rfMedia))
+
+    override fun addItem(mediaItem: MediaItem) {
+        exoPlayer.setMediaItem(mediaItem)
         exoPlayer.prepare()
     }
 

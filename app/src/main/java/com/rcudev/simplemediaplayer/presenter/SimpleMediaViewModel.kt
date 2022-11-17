@@ -1,20 +1,19 @@
 package com.rcudev.simplemediaplayer.presenter
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
-import androidx.lifecycle.viewmodel.compose.saveable
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import com.rcudev.player_service.data.module.DomainModule
 import com.rcudev.player_service.domain.usecase.GetMediaStateUseCase
-import com.rcudev.player_service.domain.models.RfMedia
-import com.rcudev.player_service.domain.models.RfMediaState
-import com.rcudev.player_service.domain.models.RfPlayerControlEvent
+import com.rcudev.player_service.domain.models.PlayerMediaState
+import com.rcudev.player_service.domain.models.PlayerControlEvent
 import com.rcudev.player_service.domain.usecase.AddItemInPlayerUseCase
 import com.rcudev.player_service.domain.usecase.SetControlPlayerEventUseCase
 import com.rcudev.player_service.domain.usecase.StartPlayerServiceUseCase
 import com.rcudev.player_service.domain.usecase.StopPlayerServiceUseCase
+import com.rcudev.simplemediaplayer.domain.AppBusinessMedia
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -24,11 +23,9 @@ class SimpleMediaViewModel : ViewModel() {
 
     private val startPlayerServiceUseCase: StartPlayerServiceUseCase = DomainModule.getStartPlayerServiceUseCase()
     private val stopPlayerServiceUseCase: StopPlayerServiceUseCase = DomainModule.getStopPlayerServiceUseCase()
-    private val addItemInPlayerUseCase: AddItemInPlayerUseCase = DomainModule.getAddItemInPlayerUseCase()
+    private val addItemInPlayerUseCase: AddItemInPlayerUseCase<AppBusinessMedia> = DomainModule.getAddItemInPlayerUseCase()
     private val getMediaStateUseCase: GetMediaStateUseCase = DomainModule.getGetMediaStateUseCase()
     private val setControlPlayerEventUseCase: SetControlPlayerEventUseCase = DomainModule.getSetControlPlayerEventUseCase()
-
-
 
     private val _uiState = MutableStateFlow<UIState>(UIState.Initial)
     val uiState = _uiState.asStateFlow()
@@ -38,13 +35,13 @@ class SimpleMediaViewModel : ViewModel() {
             loadData()
             getMediaStateUseCase().collect { mediaState ->
                 when (mediaState) {
-                    is RfMediaState.Buffering -> calculateProgressValues(mediaState.progress)
-                    is RfMediaState.Initial -> _uiState.value = UIState.Initial
-                    is RfMediaState.Playing -> {
+                    is PlayerMediaState.Buffering -> calculateProgressValues(mediaState.progress)
+                    is PlayerMediaState.Initial -> _uiState.value = UIState.Initial
+                    is PlayerMediaState.Playing -> {
                         //isPlaying = mediaState.isPlaying
                     }
-                    is RfMediaState.Progress -> calculateProgressValues(mediaState.progress)
-                    is RfMediaState.Ready -> {
+                    is PlayerMediaState.Progress -> calculateProgressValues(mediaState.progress)
+                    is PlayerMediaState.Ready -> {
                         //duration = mediaState.duration
                         _uiState.value = UIState.Ready
                     }
@@ -55,7 +52,7 @@ class SimpleMediaViewModel : ViewModel() {
 
     override fun onCleared() {
         viewModelScope.launch {
-            setControlPlayerEventUseCase(RfPlayerControlEvent.Stop)
+            setControlPlayerEventUseCase(PlayerControlEvent.Stop)
         }
         stopPlayerServiceUseCase()
     }
@@ -66,13 +63,13 @@ class SimpleMediaViewModel : ViewModel() {
 
     fun onUIEvent(uiEvent: UIEvent) = viewModelScope.launch {
         when (uiEvent) {
-            UIEvent.Backward -> setControlPlayerEventUseCase(RfPlayerControlEvent.Backward)
-            UIEvent.Forward -> setControlPlayerEventUseCase(RfPlayerControlEvent.Forward)
-            UIEvent.PlayPause -> setControlPlayerEventUseCase(RfPlayerControlEvent.PlayPause)
+            UIEvent.Backward -> setControlPlayerEventUseCase(PlayerControlEvent.Backward)
+            UIEvent.Forward -> setControlPlayerEventUseCase(PlayerControlEvent.Forward)
+            UIEvent.PlayPause -> setControlPlayerEventUseCase(PlayerControlEvent.PlayPause)
             is UIEvent.UpdateProgress -> {
                 //progress = uiEvent.newProgress
                 setControlPlayerEventUseCase(
-                    RfPlayerControlEvent.UpdateProgress(
+                    PlayerControlEvent.UpdateProgress(
                         uiEvent.newProgress
                     )
                 )
@@ -93,12 +90,29 @@ class SimpleMediaViewModel : ViewModel() {
     }
 
     private fun loadData() {
-        addItemInPlayerUseCase(RfMedia(
-            id = "id",
-            albumTitle = "SoundHelix"
-        ))
+        addItemInPlayerUseCase(
+            AppBusinessMedia(
+                id = "id",
+                albumTitle = "SoundHelix")
+        ) { appBusinessMedia ->
+            mapToMediaItem(appBusinessMedia)
+        }
     }
 
+
+    fun mapToMediaItem(appBusinessMedia: AppBusinessMedia): MediaItem {
+        return MediaItem.Builder()
+            .setMediaId(appBusinessMedia.id)
+            .setUri("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setFolderType(MediaMetadata.FOLDER_TYPE_ALBUMS)
+                    .setArtworkUri(Uri.parse("https://i.pinimg.com/736x/4b/02/1f/4b021f002b90ab163ef41aaaaa17c7a4.jpg"))
+                    .setAlbumTitle(appBusinessMedia.albumTitle)
+                    .setDisplayTitle("Song 1")
+                    .build()
+            ).build()
+    }
 }
 
 sealed class UIEvent {
