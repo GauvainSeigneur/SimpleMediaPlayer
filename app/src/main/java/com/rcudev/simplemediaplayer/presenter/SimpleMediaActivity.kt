@@ -10,7 +10,6 @@ class SimpleMediaActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.startService()
         viewModel.onUIEvent(UIEvent.PlayPause)
     }
 

@@ -5,14 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import com.rcudev.player_service.connector.PlayerConnector
 import com.rcudev.player_service.data.module.DomainModule
 import com.rcudev.player_service.domain.usecase.GetMediaStateUseCase
 import com.rcudev.player_service.domain.models.PlayerMediaState
 import com.rcudev.player_service.domain.models.PlayerControlEvent
-import com.rcudev.player_service.domain.usecase.AddItemInPlayerUseCase
 import com.rcudev.player_service.domain.usecase.SetControlPlayerEventUseCase
-import com.rcudev.player_service.domain.usecase.StartPlayerServiceUseCase
-import com.rcudev.player_service.domain.usecase.StopPlayerServiceUseCase
 import com.rcudev.simplemediaplayer.domain.AppBusinessMedia
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,11 +19,10 @@ import java.util.concurrent.TimeUnit
 
 class SimpleMediaViewModel : ViewModel() {
 
-    private val startPlayerServiceUseCase: StartPlayerServiceUseCase = DomainModule.getStartPlayerServiceUseCase()
-    private val stopPlayerServiceUseCase: StopPlayerServiceUseCase = DomainModule.getStopPlayerServiceUseCase()
-    private val addItemInPlayerUseCase: AddItemInPlayerUseCase<AppBusinessMedia> = DomainModule.getAddItemInPlayerUseCase()
     private val getMediaStateUseCase: GetMediaStateUseCase = DomainModule.getGetMediaStateUseCase()
     private val setControlPlayerEventUseCase: SetControlPlayerEventUseCase = DomainModule.getSetControlPlayerEventUseCase()
+
+    private val playerConnector = PlayerConnector()
 
     private val _uiState = MutableStateFlow<UIState>(UIState.Initial)
     val uiState = _uiState.asStateFlow()
@@ -54,11 +51,7 @@ class SimpleMediaViewModel : ViewModel() {
         viewModelScope.launch {
             setControlPlayerEventUseCase(PlayerControlEvent.Stop)
         }
-        stopPlayerServiceUseCase()
-    }
-
-    fun startService() {
-        startPlayerServiceUseCase()
+        playerConnector.stopPlayerService()
     }
 
     fun onUIEvent(uiEvent: UIEvent) = viewModelScope.launch {
@@ -90,7 +83,7 @@ class SimpleMediaViewModel : ViewModel() {
     }
 
     private fun loadData() {
-        addItemInPlayerUseCase(
+        playerConnector.addItem(
             AppBusinessMedia(
                 id = "id",
                 albumTitle = "SoundHelix")
@@ -98,7 +91,6 @@ class SimpleMediaViewModel : ViewModel() {
             mapToMediaItem(appBusinessMedia)
         }
     }
-
 
     fun mapToMediaItem(appBusinessMedia: AppBusinessMedia): MediaItem {
         return MediaItem.Builder()
