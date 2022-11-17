@@ -5,7 +5,6 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
-import com.rcudev.player_service.presentation.PlayerNotificationBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -16,14 +15,8 @@ class SimpleMediaService : MediaSessionService() {
     lateinit var player: ExoPlayer
     @Inject
     lateinit var mediaSession: MediaSession
-    @Inject
-    lateinit var notificationManager: PlayerNotificationBuilder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        notificationManager.startNotificationService(
-            mediaSessionService = this,
-            mediaSession = mediaSession
-        )
         return super.onStartCommand(intent, flags, startId)
     }
 

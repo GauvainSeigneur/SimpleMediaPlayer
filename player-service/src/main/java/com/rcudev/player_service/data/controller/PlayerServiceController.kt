@@ -15,12 +15,20 @@ class PlayerServiceController @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : PlayerServiceRepository {
 
-    private var isServiceRunning = false // todo : beurk
+    private var isServiceRunning = false
 
     override fun startService(): Boolean {
         return if (!isServiceRunning) {
-            val intent = Intent(context, SimpleMediaService::class.java)
-            ContextCompat.startForegroundService(context, intent)
+            // we add an action (Intent.ACTION_MEDIA_BUTTON) to the intent as the service expect it to notify MediaNotificationManager and
+            // create a notification and set the service in foreground
+            context.startForegroundService(
+                Intent(
+                    Intent.ACTION_MEDIA_BUTTON,
+                    null,
+                    context,
+                    SimpleMediaService::class.java
+                )
+            )
             isServiceRunning = true
             true
         } else {

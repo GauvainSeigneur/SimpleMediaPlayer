@@ -16,7 +16,6 @@ import com.rcudev.player_service.domain.repository.PlayerControlEventRepository
 import com.rcudev.player_service.domain.repository.PlayerMediaRepository
 import com.rcudev.player_service.domain.repository.PlayerServiceRepository
 import com.rcudev.player_service.domain.repository.PlayerStateRepository
-import com.rcudev.player_service.presentation.PlayerNotificationBuilder
 import com.rcudev.player_service.data.mapper.MediaItemMapper
 import dagger.Module
 import dagger.Provides
@@ -48,17 +47,6 @@ class SimpleMediaModule {
             .setHandleAudioBecomingNoisy(true)
             .setTrackSelector(DefaultTrackSelector(context))
             .build()
-
-    @Provides
-    @Singleton
-    fun provideNotificationManager(
-        @ApplicationContext context: Context,
-        player: ExoPlayer
-    ): PlayerNotificationBuilder =
-        PlayerNotificationBuilder(
-            context = context,
-            player = player
-        )
 
     @Provides
     @Singleton

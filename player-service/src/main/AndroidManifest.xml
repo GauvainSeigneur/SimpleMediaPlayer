@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <application>
+        <service
+            android:name="com.rcudev.player_service.service.SimpleMediaService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+                <!-- For backwards compatibility -->
+                <action android:name="android.support.v4.media.MediaBrowserCompat" />
+            </intent-filter>
+        </service>
+    </application>
 </manifest>

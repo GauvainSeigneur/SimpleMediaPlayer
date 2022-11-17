@@ -31,7 +31,7 @@
                 android:value="" />
         </activity>
 
-        <service android:name="com.rcudev.player_service.service.SimpleMediaService" />
+
     </application>
 
 </manifest>
