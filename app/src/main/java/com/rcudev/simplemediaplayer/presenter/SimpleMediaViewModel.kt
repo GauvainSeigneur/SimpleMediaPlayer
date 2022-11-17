@@ -42,7 +42,6 @@ class SimpleMediaViewModel : ViewModel() {
     }
 
     fun loadTrackOne() {
-        Log.d("lolilol", "loaddata")
         playerConnector.addItem(
             AppBusinessMedia(
                 id = "idOne",
@@ -54,7 +53,6 @@ class SimpleMediaViewModel : ViewModel() {
     }
 
     fun loadTrackTwo() {
-        Log.d("lolilol", "loaddata")
         playerConnector.addItem(
             AppBusinessMedia(
                 id = "idTwo",

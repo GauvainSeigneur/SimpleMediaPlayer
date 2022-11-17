@@ -1,45 +1,40 @@
 package com.rcudev.player_service.connector
 
 import androidx.media3.common.MediaItem
-import com.rcudev.player_service.internal.data.module.DomainModule
-import com.rcudev.player_service.internal.domain.models.PlayerControlEvent
-import com.rcudev.player_service.internal.domain.usecase.GetMediaStateUseCase
-import com.rcudev.player_service.internal.domain.usecase.SetControlPlayerEventUseCase
-import com.rcudev.player_service.internal.domain.usecase.StartPlayerServiceUseCase
-import com.rcudev.player_service.internal.domain.usecase.StopPlayerServiceUseCase
+import com.rcudev.player_service.internal.controller.PlayerControlEventController
+import com.rcudev.player_service.internal.controller.PlayerServiceController
+import com.rcudev.player_service.internal.di.InternalModule
+import com.rcudev.player_service.internal.models.PlayerControlEvent
 
 /**
- * Simple class
+ * Connector
  */
 class PlayerConnector {
 
-    private val startPlayerServiceUseCase: StartPlayerServiceUseCase = DomainModule.getStartPlayerServiceUseCase()
-    private val stopPlayerServiceUseCase: StopPlayerServiceUseCase = DomainModule.getStopPlayerServiceUseCase()
-    private val getMediaStateUseCase: GetMediaStateUseCase = DomainModule.getGetMediaStateUseCase()
-    private val setControlPlayerEventUseCase: SetControlPlayerEventUseCase = DomainModule.getSetControlPlayerEventUseCase()
+    private val playerServiceController : PlayerServiceController = InternalModule.getPlayerServiceController()
+    private val playerControlEventController: PlayerControlEventController = InternalModule.getPlayerControlEventController()
 
     init {
-        startPlayerServiceUseCase()
+        playerServiceController.startService()
+        InternalModule.getPlayerEventListener() //todo : delete
     }
-
 
     /**
      * Stop all process (player, notification, etc.)
      */
     fun stopPlayerService() {
-        stopPlayerServiceUseCase()
+        playerServiceController.stopService()
     }
 
-    suspend fun playPause() {
-        setControlPlayerEventUseCase(PlayerControlEvent.PlayPause)
+    fun playPause() {
+        playerControlEventController.onControlEvent(PlayerControlEvent.PlayPause)
     }
 
     /**
      * Add item in player (it does not play it)
      */
-    fun <T>addItem(t:T, transform: (T) -> MediaItem) {
-        val addItemInPlayerUseCase = DomainModule.getAddItemInPlayerUseCase<T>()
-        addItemInPlayerUseCase.invoke(t, transform)
+    fun <T> addItem(t: T, transform: (T) -> MediaItem) {
+        val addItemInPlayerUseCase = InternalModule.getPlayListController()
+        addItemInPlayerUseCase.addItem(t, transform)
     }
-
 }

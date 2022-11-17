@@ -1,27 +1,29 @@
-package com.rcudev.player_service.internal.data.controller
+package com.rcudev.player_service.internal.controller
 
-import android.content.Context
+import android.app.Application
 import android.content.Intent
 import androidx.core.content.ContextCompat
-import com.rcudev.player_service.internal.domain.repository.PlayerServiceRepository
 import com.rcudev.player_service.service.SimpleMediaService
 
+/**
+ * Class to manipulates playlist
+ */
 internal class PlayerServiceController constructor(
-    private val context: Context,
-) : PlayerServiceRepository {
+    private val application: Application,
+) {
 
     private var isServiceRunning = false
 
-    override fun startService(): Boolean {
+    fun startService(): Boolean {
         return if (!isServiceRunning) {
             // we add an action (Intent.ACTION_MEDIA_BUTTON) to the intent as the service expect it to notify MediaNotificationManager and
             // create a notification and set the service in foreground
             ContextCompat.startForegroundService(
-                context,
+                application,
                 Intent(
                     Intent.ACTION_MEDIA_BUTTON,
                     null,
-                    context,
+                    application,
                     SimpleMediaService::class.java
                 )
             )
@@ -32,11 +34,10 @@ internal class PlayerServiceController constructor(
         }
     }
 
-    override fun stopService(): Boolean {
-        context.stopService(Intent(context, SimpleMediaService::class.java))
+    fun stopService(): Boolean {
+        application.stopService(Intent(application, SimpleMediaService::class.java))
         isServiceRunning = false
         return true
     }
-
 
 }
