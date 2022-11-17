@@ -4,9 +4,8 @@ import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.rcudev.player_service.domain.models.RfMedia
-import javax.inject.Inject
 
-class MediaItemMapper @Inject constructor() {
+class MediaItemMapper {
 
     fun mapToMediaItem(rfMedia: RfMedia): MediaItem {
         return MediaItem.Builder()

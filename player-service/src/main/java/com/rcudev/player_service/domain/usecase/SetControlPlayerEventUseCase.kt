@@ -4,9 +4,8 @@ import com.rcudev.player_service.domain.models.RfPlayerControlEvent
 import com.rcudev.player_service.domain.repository.MediaStateRepository
 import com.rcudev.player_service.domain.repository.PlayerControlEventRepository
 import com.rcudev.player_service.domain.repository.PlayerStateRepository
-import javax.inject.Inject
 
-class SetControlPlayerEventUseCase @Inject constructor(
+class SetControlPlayerEventUseCase constructor(
     private val playerControlEventRepository: PlayerControlEventRepository,
     private val mediaStateRepository: MediaStateRepository,
     private val playerStateRepository: PlayerStateRepository,

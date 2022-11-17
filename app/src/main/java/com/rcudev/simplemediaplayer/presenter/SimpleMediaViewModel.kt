@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
+import com.rcudev.player_service.data.module.DomainModule
 import com.rcudev.player_service.domain.usecase.GetMediaStateUseCase
 import com.rcudev.player_service.domain.models.RfMedia
 import com.rcudev.player_service.domain.models.RfMediaState
@@ -14,28 +15,20 @@ import com.rcudev.player_service.domain.usecase.AddItemInPlayerUseCase
 import com.rcudev.player_service.domain.usecase.SetControlPlayerEventUseCase
 import com.rcudev.player_service.domain.usecase.StartPlayerServiceUseCase
 import com.rcudev.player_service.domain.usecase.StopPlayerServiceUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-@OptIn(SavedStateHandleSaveableApi::class)
-@HiltViewModel
-class SimpleMediaViewModel @Inject constructor(
-    private val startPlayerServiceUseCase: StartPlayerServiceUseCase,
-    private val stopPlayerServiceUseCase: StopPlayerServiceUseCase,
-    private val addItemInPlayerUseCase: AddItemInPlayerUseCase,
-    private val getMediaStateUseCase: GetMediaStateUseCase,
-    private val setControlPlayerEventUseCase: SetControlPlayerEventUseCase,
-    savedStateHandle: SavedStateHandle
-) : ViewModel() {
+class SimpleMediaViewModel : ViewModel() {
 
-    var duration by savedStateHandle.saveable { mutableStateOf(0L) }
-    var progress by savedStateHandle.saveable { mutableStateOf(0f) }
-    var progressString by savedStateHandle.saveable { mutableStateOf("00:00") }
-    var isPlaying by savedStateHandle.saveable { mutableStateOf(false) }
+    private val startPlayerServiceUseCase: StartPlayerServiceUseCase = DomainModule.getStartPlayerServiceUseCase()
+    private val stopPlayerServiceUseCase: StopPlayerServiceUseCase = DomainModule.getStopPlayerServiceUseCase()
+    private val addItemInPlayerUseCase: AddItemInPlayerUseCase = DomainModule.getAddItemInPlayerUseCase()
+    private val getMediaStateUseCase: GetMediaStateUseCase = DomainModule.getGetMediaStateUseCase()
+    private val setControlPlayerEventUseCase: SetControlPlayerEventUseCase = DomainModule.getSetControlPlayerEventUseCase()
+
+
 
     private val _uiState = MutableStateFlow<UIState>(UIState.Initial)
     val uiState = _uiState.asStateFlow()
@@ -47,10 +40,12 @@ class SimpleMediaViewModel @Inject constructor(
                 when (mediaState) {
                     is RfMediaState.Buffering -> calculateProgressValues(mediaState.progress)
                     is RfMediaState.Initial -> _uiState.value = UIState.Initial
-                    is RfMediaState.Playing -> isPlaying = mediaState.isPlaying
+                    is RfMediaState.Playing -> {
+                        //isPlaying = mediaState.isPlaying
+                    }
                     is RfMediaState.Progress -> calculateProgressValues(mediaState.progress)
                     is RfMediaState.Ready -> {
-                        duration = mediaState.duration
+                        //duration = mediaState.duration
                         _uiState.value = UIState.Ready
                     }
                 }
@@ -75,7 +70,7 @@ class SimpleMediaViewModel @Inject constructor(
             UIEvent.Forward -> setControlPlayerEventUseCase(RfPlayerControlEvent.Forward)
             UIEvent.PlayPause -> setControlPlayerEventUseCase(RfPlayerControlEvent.PlayPause)
             is UIEvent.UpdateProgress -> {
-                progress = uiEvent.newProgress
+                //progress = uiEvent.newProgress
                 setControlPlayerEventUseCase(
                     RfPlayerControlEvent.UpdateProgress(
                         uiEvent.newProgress
@@ -93,8 +88,8 @@ class SimpleMediaViewModel @Inject constructor(
     }
 
     private fun calculateProgressValues(currentProgress: Long) {
-        progress = if (currentProgress > 0) (currentProgress.toFloat() / duration) else 0f
-        progressString = formatDuration(currentProgress)
+        //progress = if (currentProgress > 0) (currentProgress.toFloat() / duration) else 0f
+        //progressString = formatDuration(currentProgress)
     }
 
     private fun loadData() {

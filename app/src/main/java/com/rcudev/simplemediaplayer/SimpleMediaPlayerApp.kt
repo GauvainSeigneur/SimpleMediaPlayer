@@ -1,7 +1,14 @@
 package com.rcudev.simplemediaplayer
 
 import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
+import com.rcudev.player_service.configuration.PlayerConfigurator
 
-@HiltAndroidApp
-class SimpleMediaPlayerApp: Application()
+class SimpleMediaPlayerApp: Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+        PlayerConfigurator.Builder()
+            .application(this)
+            .build()
+    }
+}

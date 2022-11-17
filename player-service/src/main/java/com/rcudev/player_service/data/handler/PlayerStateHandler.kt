@@ -10,13 +10,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * todo : check with vinc'
  * Class to handle events from [Player.Listener] events and send it to other repositories if necessary
  */
-class PlayerStateHandler @Inject constructor(
+class PlayerStateHandler constructor(
     private val player: ExoPlayer,
     private val mediaStateRepository: MediaStateRepository,
 ) : Player.Listener, PlayerStateRepository {

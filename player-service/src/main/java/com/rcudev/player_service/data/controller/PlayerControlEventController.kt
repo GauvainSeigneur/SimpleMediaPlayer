@@ -2,15 +2,13 @@ package com.rcudev.player_service.data.controller
 
 import androidx.media3.exoplayer.ExoPlayer
 import com.rcudev.player_service.domain.models.RfPlayerControlEvent
-import com.rcudev.player_service.domain.repository.MediaStateRepository
 import com.rcudev.player_service.domain.repository.PlayerControlEventRepository
 import kotlinx.coroutines.*
-import javax.inject.Inject
 
 /**
  * Class to handle events from control input (from notification or UI in application)
  */
-class PlayerControlEventController @Inject constructor(
+class PlayerControlEventController constructor(
     private val player: ExoPlayer,
 ) : PlayerControlEventRepository {
 
