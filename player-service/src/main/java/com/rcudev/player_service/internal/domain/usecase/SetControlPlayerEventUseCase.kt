@@ -1,11 +1,11 @@
-package com.rcudev.player_service.domain.usecase
+package com.rcudev.player_service.internal.domain.usecase
 
-import com.rcudev.player_service.domain.models.PlayerControlEvent
-import com.rcudev.player_service.domain.repository.MediaStateRepository
-import com.rcudev.player_service.domain.repository.PlayerControlEventRepository
-import com.rcudev.player_service.domain.repository.PlayerStateRepository
+import com.rcudev.player_service.internal.domain.models.PlayerControlEvent
+import com.rcudev.player_service.internal.domain.repository.MediaStateRepository
+import com.rcudev.player_service.internal.domain.repository.PlayerControlEventRepository
+import com.rcudev.player_service.internal.domain.repository.PlayerStateRepository
 
-class SetControlPlayerEventUseCase constructor(
+internal class SetControlPlayerEventUseCase constructor(
     private val playerControlEventRepository: PlayerControlEventRepository,
     private val mediaStateRepository: MediaStateRepository,
     private val playerStateRepository: PlayerStateRepository,

@@ -1,16 +1,12 @@
 package com.rcudev.simplemediaplayer.presenter
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.rcudev.player_service.connector.PlayerConnector
-import com.rcudev.player_service.data.module.DomainModule
-import com.rcudev.player_service.domain.usecase.GetMediaStateUseCase
-import com.rcudev.player_service.domain.models.PlayerMediaState
-import com.rcudev.player_service.domain.models.PlayerControlEvent
-import com.rcudev.player_service.domain.usecase.SetControlPlayerEventUseCase
 import com.rcudev.simplemediaplayer.domain.AppBusinessMedia
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,9 +15,6 @@ import java.util.concurrent.TimeUnit
 
 class SimpleMediaViewModel : ViewModel() {
 
-    private val getMediaStateUseCase: GetMediaStateUseCase = DomainModule.getGetMediaStateUseCase()
-    private val setControlPlayerEventUseCase: SetControlPlayerEventUseCase = DomainModule.getSetControlPlayerEventUseCase()
-
     private val playerConnector = PlayerConnector()
 
     private val _uiState = MutableStateFlow<UIState>(UIState.Initial)
@@ -29,8 +22,9 @@ class SimpleMediaViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            loadData()
-            getMediaStateUseCase().collect { mediaState ->
+
+            //todo reactivate
+            /*getMediaStateUseCase().collect { mediaState ->
                 when (mediaState) {
                     is PlayerMediaState.Buffering -> calculateProgressValues(mediaState.progress)
                     is PlayerMediaState.Initial -> _uiState.value = UIState.Initial
@@ -43,18 +37,25 @@ class SimpleMediaViewModel : ViewModel() {
                         _uiState.value = UIState.Ready
                     }
                 }
-            }
+            }*/
+        }
+    }
+
+    fun start() {
+        viewModelScope.launch {
+            loadData()
+            playerConnector.playPause()
         }
     }
 
     override fun onCleared() {
         viewModelScope.launch {
-            setControlPlayerEventUseCase(PlayerControlEvent.Stop)
+            //setControlPlayerEventUseCase(PlayerControlEvent.Stop)
         }
         playerConnector.stopPlayerService()
     }
 
-    fun onUIEvent(uiEvent: UIEvent) = viewModelScope.launch {
+    /*fun onUIEvent(uiEvent: UIEvent) = viewModelScope.launch {
         when (uiEvent) {
             UIEvent.Backward -> setControlPlayerEventUseCase(PlayerControlEvent.Backward)
             UIEvent.Forward -> setControlPlayerEventUseCase(PlayerControlEvent.Forward)
@@ -68,7 +69,7 @@ class SimpleMediaViewModel : ViewModel() {
                 )
             }
         }
-    }
+    }*/
 
     fun formatDuration(duration: Long): String {
         val minutes: Long = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
@@ -83,6 +84,7 @@ class SimpleMediaViewModel : ViewModel() {
     }
 
     private fun loadData() {
+        Log.d("lolilol", "loaddata")
         playerConnector.addItem(
             AppBusinessMedia(
                 id = "id",

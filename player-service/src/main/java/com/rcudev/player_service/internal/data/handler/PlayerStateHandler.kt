@@ -1,10 +1,10 @@
-package com.rcudev.player_service.data.handler
+package com.rcudev.player_service.internal.data.handler
 
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.rcudev.player_service.domain.repository.MediaStateRepository
-import com.rcudev.player_service.domain.repository.PlayerStateRepository
+import com.rcudev.player_service.internal.domain.repository.MediaStateRepository
+import com.rcudev.player_service.internal.domain.repository.PlayerStateRepository
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
  * todo : check with vinc'
  * Class to handle events from [Player.Listener] events and send it to other repositories if necessary
  */
-class PlayerStateHandler constructor(
+internal class PlayerStateHandler constructor(
     private val player: ExoPlayer,
     private val mediaStateRepository: MediaStateRepository,
 ) : Player.Listener, PlayerStateRepository {

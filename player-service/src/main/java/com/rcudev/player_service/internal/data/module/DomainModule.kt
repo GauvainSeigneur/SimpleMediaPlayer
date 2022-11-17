@@ -1,12 +1,12 @@
-package com.rcudev.player_service.data.module
+package com.rcudev.player_service.internal.data.module
 
-import com.rcudev.player_service.domain.usecase.AddItemInPlayerUseCase
-import com.rcudev.player_service.domain.usecase.GetMediaStateUseCase
-import com.rcudev.player_service.domain.usecase.SetControlPlayerEventUseCase
-import com.rcudev.player_service.domain.usecase.StartPlayerServiceUseCase
-import com.rcudev.player_service.domain.usecase.StopPlayerServiceUseCase
+import com.rcudev.player_service.internal.domain.usecase.AddItemInPlayerUseCase
+import com.rcudev.player_service.internal.domain.usecase.GetMediaStateUseCase
+import com.rcudev.player_service.internal.domain.usecase.SetControlPlayerEventUseCase
+import com.rcudev.player_service.internal.domain.usecase.StartPlayerServiceUseCase
+import com.rcudev.player_service.internal.domain.usecase.StopPlayerServiceUseCase
 
-object DomainModule {
+internal object DomainModule {
 
     fun getStartPlayerServiceUseCase(): StartPlayerServiceUseCase = StartPlayerServiceUseCase(DataModule.getPlayerServiceRepository())
 

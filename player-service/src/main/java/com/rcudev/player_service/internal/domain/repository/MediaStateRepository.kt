@@ -1,10 +1,10 @@
-package com.rcudev.player_service.domain.repository
+package com.rcudev.player_service.internal.domain.repository
 
 import androidx.media3.common.Player
-import com.rcudev.player_service.domain.models.PlayerMediaState
+import com.rcudev.player_service.internal.domain.models.PlayerMediaState
 import kotlinx.coroutines.flow.StateFlow
 
-interface MediaStateRepository {
+internal interface MediaStateRepository {
 
     fun updateFromPlayback(@Player.State playbackState : Int)
 

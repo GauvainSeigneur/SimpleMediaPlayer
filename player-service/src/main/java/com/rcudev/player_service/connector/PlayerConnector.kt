@@ -1,14 +1,16 @@
 package com.rcudev.player_service.connector
 
+import android.util.Log
 import androidx.media3.common.MediaItem
-import com.rcudev.player_service.data.module.DomainModule
-import com.rcudev.player_service.domain.usecase.GetMediaStateUseCase
-import com.rcudev.player_service.domain.usecase.SetControlPlayerEventUseCase
-import com.rcudev.player_service.domain.usecase.StartPlayerServiceUseCase
-import com.rcudev.player_service.domain.usecase.StopPlayerServiceUseCase
+import com.rcudev.player_service.internal.data.module.DomainModule
+import com.rcudev.player_service.internal.domain.models.PlayerControlEvent
+import com.rcudev.player_service.internal.domain.usecase.GetMediaStateUseCase
+import com.rcudev.player_service.internal.domain.usecase.SetControlPlayerEventUseCase
+import com.rcudev.player_service.internal.domain.usecase.StartPlayerServiceUseCase
+import com.rcudev.player_service.internal.domain.usecase.StopPlayerServiceUseCase
 
 /**
- *
+ * Simple class
  */
 class PlayerConnector {
 
@@ -29,11 +31,17 @@ class PlayerConnector {
         stopPlayerServiceUseCase()
     }
 
+    suspend fun playPause() {
+        setControlPlayerEventUseCase(PlayerControlEvent.PlayPause)
+    }
+
     /**
      * Add item in player (it does not play it)
      */
     fun <T>addItem(t:T, transform: (T) -> MediaItem) {
-        DomainModule.getAddItemInPlayerUseCase<T>().invoke(t, transform)
+        Log.d("lolilol", "add item called $transform")
+        val l = DomainModule.getAddItemInPlayerUseCase<T>()
+        l.invoke(t, transform)
     }
 
 }

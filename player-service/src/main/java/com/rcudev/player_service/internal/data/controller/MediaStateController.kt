@@ -1,8 +1,8 @@
-package com.rcudev.player_service.data.controller
+package com.rcudev.player_service.internal.data.controller
 
 import androidx.media3.exoplayer.ExoPlayer
-import com.rcudev.player_service.domain.repository.MediaStateRepository
-import com.rcudev.player_service.domain.models.PlayerMediaState
+import com.rcudev.player_service.internal.domain.repository.MediaStateRepository
+import com.rcudev.player_service.internal.domain.models.PlayerMediaState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * Class to handle a shared [PlayerMediaState] flow transformed by event on player and control event (input from user)
  */
-class MediaStateController constructor(
+internal class MediaStateController constructor(
     private val player: ExoPlayer,
 ): MediaStateRepository {
 

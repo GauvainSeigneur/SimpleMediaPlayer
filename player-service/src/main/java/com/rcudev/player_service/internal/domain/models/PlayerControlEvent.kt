@@ -1,4 +1,4 @@
-package com.rcudev.player_service.domain.models
+package com.rcudev.player_service.internal.domain.models
 
 
 sealed class PlayerControlEvent {
