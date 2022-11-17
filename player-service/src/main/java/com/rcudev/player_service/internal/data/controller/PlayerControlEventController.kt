@@ -7,6 +7,7 @@ import kotlinx.coroutines.*
 
 /**
  * Class to handle events from control input (from notification or UI in application)
+ * //todo remove it
  */
 internal class PlayerControlEventController constructor(
     private val player: ExoPlayer,
@@ -19,6 +20,7 @@ internal class PlayerControlEventController constructor(
     }
 
     override suspend fun onControlEvent(event: PlayerControlEvent) {
+        player.prepare()
         when (event) {
             PlayerControlEvent.Backward -> player.seekBack()
             PlayerControlEvent.Forward -> player.seekForward()

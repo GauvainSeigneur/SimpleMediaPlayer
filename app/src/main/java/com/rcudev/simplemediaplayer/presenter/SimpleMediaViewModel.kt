@@ -41,9 +41,32 @@ class SimpleMediaViewModel : ViewModel() {
         }
     }
 
-    fun start() {
+    fun loadTrackOne() {
+        Log.d("lolilol", "loaddata")
+        playerConnector.addItem(
+            AppBusinessMedia(
+                id = "idOne",
+                albumTitle = "SoundHelix ONE",
+                url = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
+        ) { appBusinessMedia ->
+            mapToMediaItem(appBusinessMedia)
+        }
+    }
+
+    fun loadTrackTwo() {
+        Log.d("lolilol", "loaddata")
+        playerConnector.addItem(
+            AppBusinessMedia(
+                id = "idTwo",
+                albumTitle = "SoundHelix TWO",
+                url = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3")
+        ) { appBusinessMedia ->
+            mapToMediaItem(appBusinessMedia)
+        }
+    }
+
+    fun playPause() {
         viewModelScope.launch {
-            loadData()
             playerConnector.playPause()
         }
     }
@@ -83,21 +106,12 @@ class SimpleMediaViewModel : ViewModel() {
         //progressString = formatDuration(currentProgress)
     }
 
-    private fun loadData() {
-        Log.d("lolilol", "loaddata")
-        playerConnector.addItem(
-            AppBusinessMedia(
-                id = "id",
-                albumTitle = "SoundHelix")
-        ) { appBusinessMedia ->
-            mapToMediaItem(appBusinessMedia)
-        }
-    }
+
 
     fun mapToMediaItem(appBusinessMedia: AppBusinessMedia): MediaItem {
         return MediaItem.Builder()
             .setMediaId(appBusinessMedia.id)
-            .setUri("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
+            .setUri(appBusinessMedia.url)
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setFolderType(MediaMetadata.FOLDER_TYPE_ALBUMS)

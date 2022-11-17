@@ -1,6 +1,5 @@
 package com.rcudev.player_service.connector
 
-import android.util.Log
 import androidx.media3.common.MediaItem
 import com.rcudev.player_service.internal.data.module.DomainModule
 import com.rcudev.player_service.internal.domain.models.PlayerControlEvent
@@ -39,9 +38,8 @@ class PlayerConnector {
      * Add item in player (it does not play it)
      */
     fun <T>addItem(t:T, transform: (T) -> MediaItem) {
-        Log.d("lolilol", "add item called $transform")
-        val l = DomainModule.getAddItemInPlayerUseCase<T>()
-        l.invoke(t, transform)
+        val addItemInPlayerUseCase = DomainModule.getAddItemInPlayerUseCase<T>()
+        addItemInPlayerUseCase.invoke(t, transform)
     }
 
 }

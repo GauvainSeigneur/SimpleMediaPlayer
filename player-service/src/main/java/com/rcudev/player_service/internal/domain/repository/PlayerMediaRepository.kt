@@ -4,6 +4,7 @@ import androidx.media3.common.MediaItem
 
 internal interface PlayerMediaRepository {
 
-    fun addItem(mediaItem: MediaItem)
+    fun addMediaItem(mediaItem: MediaItem)
 
+    fun setMediaItem(mediaItem: MediaItem)
 }

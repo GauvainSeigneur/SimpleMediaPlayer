@@ -29,6 +29,7 @@ internal class PlayerStateHandler constructor(
 
     override fun getIsPlaying(): Boolean = player.isPlaying
 
+
     override fun onPlaybackStateChanged(playbackState: Int) {
         mediaStateRepository.updateFromPlayback(playbackState)
     }

@@ -17,7 +17,7 @@ internal class PlayerServiceController constructor(
             // we add an action (Intent.ACTION_MEDIA_BUTTON) to the intent as the service expect it to notify MediaNotificationManager and
             // create a notification and set the service in foreground
             ContextCompat.startForegroundService(
-                context, 
+                context,
                 Intent(
                     Intent.ACTION_MEDIA_BUTTON,
                     null,
