@@ -2,33 +2,59 @@ package com.rcudev.player_service.internal.controller
 
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
+import com.rcudev.player_service.internal.datasource.PlaylistDataSource
+import com.rcudev.player_service.internal.models.PlaylistItem
 
 /**
  * Class to manipulates playlist
  */
 internal class PlaylistController constructor(
     private val exoPlayer: ExoPlayer,
+    private val playlistDataSource: PlaylistDataSource,
 ) {
+
+    /**
+     * Get playlist
+     */
+    fun getPlaylist(): List<PlaylistItem> {
+        return playlistDataSource.getPlaylist()
+    }
 
     /**
      * Add
      * add item o current playlist, create a new oen if null
      */
 
-    fun <T>addItem(customMedia: T, transform: (T) -> MediaItem) {
-        exoPlayer.addMediaItem(transform(customMedia))
+    fun <T> addItem(
+        customMedia: T,
+        transform: (T) -> MediaItem,
+    ) {
+        val mediaItem = transform(customMedia)
+        playlistDataSource.addItemInPlaylist(mediaItem, customMedia)
+        // finally add to exoPlayer
+        exoPlayer.addMediaItem(mediaItem)
     }
 
-    fun <T>addItem(customMedia: T, transform: (T) -> MediaItem, index: Int) {
+    fun <T> addItem(customMedia: T, transform: (T) -> MediaItem, index: Int) {
+        val mediaItem = transform(customMedia)
+        playlistDataSource.addItemInPlaylist(mediaItem, customMedia)
         exoPlayer.addMediaItem(index, transform(customMedia))
     }
 
-    fun <T>addItems(customMedias: List<T>, transform: (List<T>) -> List<MediaItem>) {
+    fun <T> addItems(customMedias: List<T>, transform: (List<T>) -> List<MediaItem>) {
+        val mediaItems = transform(customMedias)
+        playlistDataSource.addItemsInPlaylist(
+            mediaItems.zip(customMedias).toMap()
+        )
         exoPlayer.addMediaItems(transform(customMedias))
     }
 
-    fun <T>addItems(customMedias: List<T>, transform: (List<T>) -> List<MediaItem>, index: Int) {
-        exoPlayer.addMediaItems(index, transform(customMedias))
+    fun <T> addItems(customMedias: List<T>, transform: (List<T>) -> List<MediaItem>, index: Int) {
+        val mediaItems = transform(customMedias)
+        playlistDataSource.addItemsInPlaylist(
+            mediaItems.zip(customMedias).toMap()
+        )
+        exoPlayer.addMediaItems(index, mediaItems)
     }
 
     /**
@@ -50,22 +76,22 @@ internal class PlaylistController constructor(
      * SET
      * Set clear the current playlist and create a new one with the new item
      */
-    fun <T>setItem(
+    fun <T> setItem(
         customMedia: T,
         transform: (T) -> MediaItem,
     ) {
         exoPlayer.setMediaItem(transform(customMedia))
     }
 
-    fun <T>setItem(
+    fun <T> setItem(
         customMedia: T,
         transform: (T) -> MediaItem,
         startPositionMs: Long,
     ) {
-        exoPlayer.setMediaItem(transform(customMedia),startPositionMs)
+        exoPlayer.setMediaItem(transform(customMedia), startPositionMs)
     }
 
-    fun <T>setItem(
+    fun <T> setItem(
         customMedia: T,
         transform: (T) -> MediaItem,
         resetPosition: Boolean,
@@ -73,11 +99,11 @@ internal class PlaylistController constructor(
         exoPlayer.setMediaItem(transform(customMedia), resetPosition)
     }
 
-    fun <T>setItems(customMedias: List<T>, transform: (List<T>) -> List<MediaItem>) {
+    fun <T> setItems(customMedias: List<T>, transform: (List<T>) -> List<MediaItem>) {
         exoPlayer.setMediaItems(transform(customMedias))
     }
 
-    fun <T>setItems(customMedias: List<T>, transform: (List<T>) -> List<MediaItem>, startIndex: Int,  startPositionMs: Long) {
+    fun <T> setItems(customMedias: List<T>, transform: (List<T>) -> List<MediaItem>, startIndex: Int, startPositionMs: Long) {
         exoPlayer.setMediaItems(transform(customMedias), startIndex, startPositionMs)
     }
 }
